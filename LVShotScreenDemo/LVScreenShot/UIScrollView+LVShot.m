@@ -11,35 +11,27 @@
 
 @implementation UIScrollView (LVShot)
 
-
--(void)DDGContentScreenShot:(void(^)(UIImage*screenShotImage))completion{
+- (void)DDGContentScreenShot:(void(^)(UIImage*screenShotImage))completion {
 
     self.isShoting = YES;
-
 
     UIView *snapShotView = [self snapshotViewAfterScreenUpdates:YES];
     snapShotView.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, snapShotView.frame.size.width, snapShotView.frame.size.height);
 
     [self.superview addSubview:snapShotView];
 
-
     CGRect bakFrame = self.frame;
     CGPoint bakOffset = self.contentOffset;
     UIView *bakSuperView = self.superview;
-    NSInteger bakIndex = [self.superview.subviews indexOfObject:self ];
+    NSInteger bakIndex = [self.superview.subviews indexOfObject:self];
 
-
-
-    if(self.frame.size.height<self.contentSize.height){
-
+    if (self.frame.size.height<self.contentSize.height) {
         self.contentOffset = CGPointMake(0, self.contentSize.height- self.frame.size.height);
     }
-
 
     __weak typeof(self) weakSelf = self;
 
     [self DDGRenderImageView:^(UIImage *screenShotImage) {
-
 
         __strong typeof(weakSelf) StrongSelf = weakSelf;
 
@@ -52,17 +44,11 @@
         StrongSelf.isShoting = NO;
         completion(screenShotImage);
 
-
     }];
-
-
-
 
 }
 
--(void)DDGRenderImageView:(void(^)(UIImage*screenShotImage))completion{
-
-
+- (void)DDGRenderImageView:(void(^)(UIImage* screenShotImage))completion{
 
     UIView *ddgTempRenderview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.contentSize.width, self.contentSize.height)];
 
@@ -83,16 +69,13 @@
         }
 
         UIImage *screenShotImage = UIGraphicsGetImageFromCurrentImageContext();
-
         UIGraphicsEndImageContext();
-
         completion(screenShotImage);
-
     });
 
 }
 
--(void)DDGContentScrollScreenShot:(void(^)(UIImage*screenShotImage))completion{
+- (void)DDGContentScrollScreenShot:(void(^)(UIImage* screenShotImage))completion{
 
     self.isShoting = YES;
 
@@ -107,7 +90,6 @@
 
     UIGraphicsBeginImageContextWithOptions(self.contentSize, NO, UIScreen.mainScreen.scale);
 
-
     __weak typeof(self) weakSelf = self;
 
      [self DDGContentScrollPageDrawWithIndex:0 MaxIndex:page callBack:^{
@@ -119,51 +101,40 @@
          [snapShotView removeFromSuperview];
          StrongSelf.isShoting = NO;
          completion(screenShotImage);
-
-
     }];
-
-
 
 }
 
--(void)DDGContentScrollPageDrawWithIndex:(int)index MaxIndex:(int)maxIndex callBack:(void(^)())callBack{
+- (void)DDGContentScrollPageDrawWithIndex:(int)index
+                                 MaxIndex:(int)maxIndex
+                                 callBack:(void(^)())callBack{
 
     [self setContentOffset:CGPointMake(0, index*self.frame.size.height) animated:NO];
     CGRect splitFrame = CGRectMake(0, index*self.frame.size.height, self.bounds.size.width, self.bounds.size.height);
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 
-
         [self drawViewHierarchyInRect:splitFrame afterScreenUpdates:YES];
         if(index <maxIndex){
-
             [self DDGContentScrollPageDrawWithIndex:index+1 MaxIndex:maxIndex callBack:callBack];
         }else{
-
             callBack();
         }
     });
-
 }
-
-
 
 @end
 
 
 @implementation UIWebView (LVShot)
 
-
--(void)DDGContentScreenShot:(void(^)(UIImage*screenShotImage))completion{
-
+- (void)DDGContentScreenShot:(void(^)(UIImage*screenShotImage))completion{
     [self.scrollView DDGContentScreenShot:completion];
 }
 
--(void)DDGContentScrollScreenShot:(void(^)(UIImage*screenShotImage))completion{
+- (void)DDGContentScrollScreenShot:(void(^)(UIImage*screenShotImage))completion{
     [self.scrollView DDGContentScrollScreenShot:completion];
 }
-
 
 @end
 

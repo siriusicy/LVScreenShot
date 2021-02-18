@@ -8,13 +8,11 @@
 
 #import "WKWebView+LVShot.h"
 #import "UIView+LVShot.h"
-
-
 #import <WebKit/WebKit.h>
 
 @implementation WKWebView (LVShot)
 
--(void)DDGContentScreenShot:(void(^)(UIImage*screenShotImage))completion{
+- (void)DDGContentScreenShot:(void(^)(UIImage* screenShotImage))completion{
 
     self.isShoting = YES;
 
@@ -54,7 +52,7 @@
 
 }
 
--(void)DDGContentScreenShotWithoutOffset:(void(^)(UIImage*screenShotImage))completion{
+- (void)DDGContentScreenShotWithoutOffset:(void(^)(UIImage*screenShotImage))completion{
 
     UIView *containerView = [[UIView alloc]initWithFrame:self.bounds ];
     CGRect bakFrame = self.frame;
@@ -75,7 +73,6 @@
 
     [self DDGContentPageDrawWithUIView:containerView Index:0 MaxIndex:(int)page DrawCallBack:^{
 
-
         __strong typeof(weakSelf) StrongSelf = weakSelf;
 
         UIImage *screnShotImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -89,14 +86,14 @@
 
         completion(screnShotImage);
 
-
     }];
-
 
 }
 
--(void)DDGContentPageDrawWithUIView:(UIView*)targetView Index:(int) index MaxIndex:(int)maxIndex DrawCallBack:(void (^)(void))callBack{
-
+- (void)DDGContentPageDrawWithUIView:(UIView*)targetView
+                               Index:(int) index
+                            MaxIndex:(int)maxIndex
+                        DrawCallBack:(void (^)(void))callBack {
 
     CGRect splitFrame = CGRectMake(0, index *targetView.frame.size.height, targetView.bounds.size.width, targetView.frame.size.height);
 
@@ -108,9 +105,9 @@
 
         [targetView drawViewHierarchyInRect:splitFrame afterScreenUpdates:YES];
 
-        if(index <maxIndex){
+        if (index < maxIndex) {
             [self DDGContentPageDrawWithUIView:targetView Index:index+1 MaxIndex:maxIndex DrawCallBack:callBack];
-        }else{
+        } else {
             callBack();
         }
     });
@@ -118,10 +115,9 @@
 }
 
 
--(void)shotScreenContentScrollCapture:(void(^)(UIImage*screenShotImage))completion{
+- (void)shotScreenContentScrollCapture:(void(^)(UIImage* screenShotImage))completion{
 
     self.isShoting = YES;
-
 
     UIView *snapShotVIew = [self snapshotViewAfterScreenUpdates:YES];
 
@@ -133,7 +129,6 @@
     int page = floor(self.scrollView.contentSize.height/self.bounds.size.height);
     UIGraphicsBeginImageContextWithOptions(self.scrollView.contentSize, NO, UIScreen.mainScreen.scale);
 
-
     __weak typeof(self) weakself = self;
     [self shotScreenContentScrollPageDrawWithIndex:0 MaxIndex:page DrawCallBack:^{
 
@@ -142,31 +137,24 @@
         UIImage *captureImage = UIGraphicsGetImageFromCurrentImageContext();
 
         UIGraphicsEndImageContext();
-
-
-        [StrongSelf.scrollView setContentOffset:bakOffset    animated:NO];
-
+        [StrongSelf.scrollView setContentOffset:bakOffset animated:NO];
         [snapShotVIew removeFromSuperview];
 
         StrongSelf.isShoting = NO;
         completion(captureImage);
-
-
     }];
-
-
-
-
+    
 }
 
--(void)shotScreenContentScrollPageDrawWithIndex:(int)index MaxIndex:(int)maxIndex DrawCallBack:(void (^)(void))callBack{
+- (void)shotScreenContentScrollPageDrawWithIndex:(int)index
+                                        MaxIndex:(int)maxIndex
+                                    DrawCallBack:(void (^)(void))callBack {
 
     [self.scrollView setContentOffset:CGPointMake(0, index*self.scrollView.frame.size.height) animated:NO];
 
     CGRect splitFrame = CGRectMake(0, index*self.scrollView.frame.size.height, self.bounds.size.width, self.bounds.size.height);
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-
 
         [self drawViewHierarchyInRect:splitFrame afterScreenUpdates:YES];
 
@@ -178,7 +166,5 @@
 
     });
 }
-    
-
 
 @end

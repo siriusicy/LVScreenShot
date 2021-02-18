@@ -10,13 +10,10 @@
 
 @interface UIView (LVShot)
 
+@property (nonatomic, assign) BOOL isShoting;
 
-
-@property (nonatomic,assign)BOOL  isShoting;
--(BOOL)DDGContainsWKWebView;
-
-
--(void)DDGScreenShotWithCompletionHandle:(void(^)(UIImage*screenShotImage))completion;
+- (BOOL)DDGContainsWKWebView;
+- (void)DDGScreenShotWithCompletionHandle:(void(^)(UIImage*screenShotImage))completion;
 
 
 @end

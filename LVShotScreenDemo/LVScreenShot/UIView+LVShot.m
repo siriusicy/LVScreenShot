@@ -12,15 +12,13 @@
 
 static const NSString * DDGViewScreenShotKey_IsShoting = @"DDGViewScreenShotKey_IsShoting";
 
-
 @implementation UIView (LVShot)
 
-
--(void)setIsShoting:(BOOL)isShoting{
+- (void)setIsShoting:(BOOL)isShoting {
     NSNumber *num = [NSNumber numberWithBool:isShoting];
     objc_setAssociatedObject(self, &DDGViewScreenShotKey_IsShoting, num, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
--(BOOL)isShoting{
+- (BOOL)isShoting {
 
     NSNumber *number = objc_getAssociatedObject(self,&DDGViewScreenShotKey_IsShoting);
 
@@ -34,16 +32,13 @@ static const NSString * DDGViewScreenShotKey_IsShoting = @"DDGViewScreenShotKey_
     return NO;
 }
 
--(BOOL)DDGContainsWKWebView{
+- (BOOL)DDGContainsWKWebView{
 
-    if([self isKindOfClass:[WKWebView class]]){
-
+    if ([self isKindOfClass:[WKWebView class]]) {
         return YES;
     }
 
     for (UIView *sbView in self.subviews) {
-
-
         if([sbView DDGContainsWKWebView]){
             return YES;
         }
@@ -51,7 +46,7 @@ static const NSString * DDGViewScreenShotKey_IsShoting = @"DDGViewScreenShotKey_
     return NO;
 
 }
--(void)DDGScreenShotWithCompletionHandle:(void(^)(UIImage*screenShotImage))completion{
+- (void)DDGScreenShotWithCompletionHandle:(void(^)(UIImage* screenShotImage))completion {
 
     self.isShoting = YES;
 
@@ -64,7 +59,6 @@ static const NSString * DDGViewScreenShotKey_IsShoting = @"DDGViewScreenShotKey_
     CGContextSaveGState(context);
     CGContextTranslateCTM(context, -self.frame.origin.x, -self.frame.origin.y);
 
-
     if ([self isKindOfClass:[UIWindow class]]) {
         CGSize imageSize = CGSizeZero;
         UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
@@ -75,42 +69,33 @@ static const NSString * DDGViewScreenShotKey_IsShoting = @"DDGViewScreenShotKey_
 
         UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
         CGContextRef context = UIGraphicsGetCurrentContext();
-        for (UIWindow *window in [[UIApplication sharedApplication] windows])
-        {
+        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
             CGContextSaveGState(context);
             CGContextTranslateCTM(context, window.center.x, window.center.y);
             CGContextConcatCTM(context, window.transform);
             CGContextTranslateCTM(context, -window.bounds.size.width * window.layer.anchorPoint.x, -window.bounds.size.height * window.layer.anchorPoint.y);
-            if (orientation == UIInterfaceOrientationLandscapeLeft)
-            {
+            if (orientation == UIInterfaceOrientationLandscapeLeft) {
                 CGContextRotateCTM(context, M_PI_2);
                 CGContextTranslateCTM(context, 0, -imageSize.width);
             }
-            else if (orientation == UIInterfaceOrientationLandscapeRight)
-            {
+            else if (orientation == UIInterfaceOrientationLandscapeRight) {
                 CGContextRotateCTM(context, -M_PI_2);
                 CGContextTranslateCTM(context, -imageSize.height, 0);
             } else if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
                 CGContextRotateCTM(context, M_PI);
                 CGContextTranslateCTM(context, -imageSize.width, -imageSize.height);
             }
-            if ([window respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)])
-            {
+            if ([window respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)]) {
                 [window drawViewHierarchyInRect:window.bounds afterScreenUpdates:YES];
-            }
-            else
-            {
+            } else {
                 [window.layer renderInContext:context];
             }
             CGContextRestoreGState(context);
         }
 
-
-    }else
-
-    if([ self DDGContainsWKWebView ]){
+    } else if ([self DDGContainsWKWebView]) {
         [self drawViewHierarchyInRect:bounds afterScreenUpdates:YES];
-    }else{
+    } else {
         [self.layer renderInContext:context];
     }
 
@@ -122,11 +107,6 @@ static const NSString * DDGViewScreenShotKey_IsShoting = @"DDGViewScreenShotKey_
 
     completion(shotImage);
 
-
 }
-
-
-
-    
 
 @end
